@@ -3,6 +3,11 @@ import ProductGallery from './components/ProductGallery';
 import ProductDetails from './components/ProductDetails';
 import EMISelector from './components/EMISelector';
 import Navbar from './components/Navbar';
+import imgMain from './assets/product/main.png';
+import imgCamera from './assets/product/camera.png';
+import imgSide from './assets/product/side.png';
+import imgFeatures from './assets/product/features.png';
+import imgLineup from './assets/product/lineup.png';
 
 const productData = {
   name: "Apple iPhone 17 Pro",
@@ -10,11 +15,7 @@ const productData = {
   storage: "256 GB",
   mrp: 139900,
   price: 134900,
-  images: [
-    "https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&q=80&w=800", // iPhone-like image
-    "https://images.unsplash.com/photo-1592750475338-74575a4958fc?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&q=80&w=800"
-  ],
+  images: [imgMain, imgCamera, imgSide, imgFeatures, imgLineup],
   emiPlans: [
     { tenure: 6, amount: 22480, interest: 0, cashback: 0 },
     { tenure: 9, amount: 14987, interest: 0, cashback: 0 },
