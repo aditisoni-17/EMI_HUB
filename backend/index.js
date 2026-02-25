@@ -1,81 +1,59 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const ProductSchema = new mongoose.Schema({
-    name: String,
-    slug: { type: String, unique: true },
-    variant: String,
-    storage: String,
-    mrp: Number,
-    price: Number,
-    variantImages: Object,
-    emiPlans: Array,
-    variants: Array,
-    storages: Array
+const pool = mysql.createPool({
+    uri: process.env.DATABASE_URL || 'mysql://root:@localhost:3306/emi_hub',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
-const Product = mongoose.model('Product', ProductSchema);
 
-// USE A MORE SPECIFIC PREFIX FOR SLUGS
-app.get('/api/product/detail/:slug', async (req, res) => {
+app.get('/api/products/:slug', async (req, res) => {
     try {
-        console.log('Fetching Product by Slug:', req.params.slug);
-        const product = await Product.findOne({ slug: req.params.slug });
-        if (!product) {
-            console.log('Product not found for slug:', req.params.slug);
-            return res.status(404).json({ message: 'Not found' });
-        }
+        const [products] = await pool.query('SELECT * FROM products WHERE slug = ?', [req.params.slug]);
+        if (products.length === 0) return res.status(404).json({ message: 'Product not found' });
+
+        let product = products[0];
+
+        const [plans] = await pool.query('SELECT * FROM emi_plans WHERE product_id = ?', [product.id]);
+        product.emiPlans = plans;
+
+        product.variantImages = typeof product.variantImages === 'string' ? JSON.parse(product.variantImages) : product.variantImages;
+        product.variants = typeof product.variants === 'string' ? JSON.parse(product.variants) : product.variants;
+        product.storages = typeof product.storages === 'string' ? JSON.parse(product.storages) : product.storages;
+
         res.json(product);
     } catch (err) {
-        res.status(500).json({ message: 'Error' });
+        console.error("DB Error fetching product:", err);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
 app.get('/api/products', async (req, res) => {
-    const products = await Product.find();
-    res.json(products);
+    try {
+        const [products] = await pool.query('SELECT * FROM products');
+        for (let product of products) {
+            const [plans] = await pool.query('SELECT * FROM emi_plans WHERE product_id = ?', [product.id]);
+            product.emiPlans = plans;
+            product.variantImages = typeof product.variantImages === 'string' ? JSON.parse(product.variantImages) : product.variantImages;
+            product.variants = typeof product.variants === 'string' ? JSON.parse(product.variants) : product.variants;
+            product.storages = typeof product.storages === 'string' ? JSON.parse(product.storages) : product.storages;
+        }
+        res.json(products);
+    } catch (err) {
+        console.error("DB Error fetching products:", err);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
-const start = async () => {
-    const mongod = await MongoMemoryServer.create();
-    await mongoose.connect(mongod.getUri());
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(5001, () => console.log('Server running on port 5001'));
+}
 
-    await Product.deleteMany({});
-    await Product.insertMany([
-        {
-            name: "Apple iPhone 17 Pro",
-            slug: "iphone-17-pro",
-            variant: "Silver",
-            storage: "256 GB",
-            mrp: 139900,
-            price: 134900,
-            variantImages: { "Silver": ["main.png"] },
-            emiPlans: [{ tenure: 6, amount: 22480, interest: 0, cashback: 0 }],
-            variants: ["Silver"],
-            storages: ["256 GB"]
-        },
-        {
-            name: "Samsung Galaxy S24 Ultra",
-            slug: "samsung-s24-ultra",
-            variant: "Gray",
-            storage: "512 GB",
-            mrp: 129999,
-            price: 124999,
-            variantImages: { "Gray": ["main.png"] },
-            emiPlans: [{ tenure: 6, amount: 20833, interest: 0, cashback: 0 }],
-            variants: ["Gray"],
-            storages: ["512 GB"]
-        }
-    ]);
-    console.log('Backend Seeded Internal');
-
-    app.listen(5001, () => console.log('Server running on 5001'));
-};
-
-start();
+module.exports = app;

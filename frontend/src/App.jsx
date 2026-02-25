@@ -19,37 +19,67 @@ import imgBlack from './assets/product/black.png';
 import imgTitanium from './assets/product/titanium.png';
 import imgGold from './assets/product/gold.png';
 
-const staticProductData = {
-  name: "Apple iPhone 17 Pro",
-  variant: "Silver",
-  storage: "256 GB",
-  mrp: 139900,
-  price: 134900,
-  variantImages: {
-    "Silver": [imgMain, imgCamera, imgSide, imgFeatures, imgLineup],
-    "Titanium": [imgTitanium, imgCamera, imgSide, imgFeatures, imgLineup],
-    "Gold": [imgGold, imgCamera, imgSide, imgFeatures, imgLineup],
-    "Black": [imgBlack, imgCamera, imgSide, imgFeatures, imgLineup]
-  },
-  emiPlans: [
-    { tenure: 6, amount: 22480, interest: 0, cashback: 0 },
-    { tenure: 9, amount: 14987, interest: 0, cashback: 0 },
-    { tenure: 12, amount: 11240, interest: 0, cashback: 0 },
-    { tenure: 18, amount: 8500, interest: 10.5, cashback: 2000 },
-  ],
-  variants: ["Silver", "Titanium", "Gold", "Black"],
-  storages: ["128 GB", "256 GB", "512 GB", "1 TB"]
-};
-
 function ProductPage() {
   const { slug } = useParams();
-  const [productData, setProductData] = useState(staticProductData);
-  const [selectedPlan, setSelectedPlan] = useState(staticProductData.emiPlans[0]);
+  const [productData, setProductData] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeVariant, setActiveVariant] = useState(staticProductData.variant);
-  const [activeStorage, setActiveStorage] = useState(staticProductData.storage);
+  const [activeVariant, setActiveVariant] = useState("");
+  const [activeStorage, setActiveStorage] = useState("");
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setIsLoading(true);
+      try {
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        const url = slug
+          ? `${baseUrl}/api/products/${slug}`
+          : `${baseUrl}/api/products/iphone-17-pro`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Product fetch failed");
+        const fetchedProduct = await response.json();
+
+        if (fetchedProduct) {
+          const imageMap = {
+            "main.png": imgMain, "camera.png": imgCamera, "side.png": imgSide,
+            "features.png": imgFeatures, "lineup.png": imgLineup,
+            "black.png": imgBlack, "titanium.png": imgTitanium, "gold.png": imgGold
+          };
+
+          const mappedVariantImages = {};
+          if (fetchedProduct.variantImages) {
+            Object.keys(fetchedProduct.variantImages).forEach(variant => {
+              mappedVariantImages[variant] = fetchedProduct.variantImages[variant].map(imgName => imageMap[imgName] || imgName);
+            });
+            fetchedProduct.variantImages = mappedVariantImages;
+          }
+
+          setProductData(fetchedProduct);
+          setSelectedPlan(fetchedProduct.emiPlans && fetchedProduct.emiPlans.length > 0 ? fetchedProduct.emiPlans[0] : null);
+          setActiveVariant(fetchedProduct.variant);
+          setActiveStorage(fetchedProduct.storage);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [slug]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (!productData) return <div className="p-20 text-center font-bold">Product not found.</div>;
 
