@@ -34,7 +34,7 @@ function ProductPage() {
     const fetchProduct = async () => {
       setIsLoading(true);
       try {
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        const baseUrl = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : '');
         const url = slug
           ? `${baseUrl}/api/products/${slug}`
           : `${baseUrl}/api/products/iphone-17-pro`;
