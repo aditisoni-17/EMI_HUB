@@ -9,7 +9,6 @@ import SignupModal from './components/SignupModal';
 import Footer from './components/Footer';
 import PaymentModal from './components/PaymentModal';
 import TechnicalSpecs from './components/TechnicalSpecs';
-import Sidebar from './components/Sidebar';
 import imgMain from './assets/product/main.png';
 import imgCamera from './assets/product/camera.png';
 import imgSide from './assets/product/side.png';
@@ -26,7 +25,6 @@ function ProductPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeVariant, setActiveVariant] = useState("");
   const [activeStorage, setActiveStorage] = useState("");
 
@@ -85,15 +83,7 @@ function ProductPage() {
 
   return (
     <div className="min-h-screen bg-[#f7f9fa] font-sans">
-      <Navbar
-        onSignupClick={() => setIsModalOpen(true)}
-        onMenuClick={() => setIsSidebarOpen(true)}
-      />
-
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
+      <Navbar onSignupClick={() => setIsModalOpen(true)} />
 
       {isModalOpen && <SignupModal onClose={() => setIsModalOpen(false)} />}
 
