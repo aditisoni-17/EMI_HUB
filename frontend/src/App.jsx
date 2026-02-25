@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+console.log("HMR Reload trigger");
 import { BrowserRouter as Router, Routes, Route, useParams, useNavigate, Navigate } from 'react-router-dom';
 import ProductGallery from './components/ProductGallery';
 import ProductDetails from './components/ProductDetails';
