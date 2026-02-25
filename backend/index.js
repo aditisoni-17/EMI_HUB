@@ -7,8 +7,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const dbUrlStr = process.env.DATABASE_URL || 'mysql://root:@localhost:3306/emi_hub';
+const url = new URL(dbUrlStr);
+const sslRequired = url.searchParams.get('ssl-mode') === 'REQUIRED';
+const dbName = url.pathname.replace('/', '') || 'emi_hub';
+
 const pool = mysql.createPool({
-    uri: process.env.DATABASE_URL || 'mysql://root:@localhost:3306/emi_hub',
+    host: url.hostname,
+    port: url.port,
+    user: url.username,
+    password: url.password,
+    database: dbName,
+    ssl: sslRequired ? { rejectUnauthorized: false } : undefined,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

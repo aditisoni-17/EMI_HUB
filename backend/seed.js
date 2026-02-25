@@ -4,16 +4,31 @@ require('dotenv').config();
 async function seed() {
     let connection;
     try {
-        const dbUrl = process.env.DATABASE_URL || 'mysql://root:@localhost:3306/emi_hub';
-        console.log(`Connecting to: ${dbUrl}`);
+        const dbUrlStr = process.env.DATABASE_URL || 'mysql://root:@localhost:3306/emi_hub';
+        console.log(`Connecting to: ${dbUrlStr}`);
 
-        // Connect without database first to create it if it doesn't exist (assuming local testing)
+        // Properly parse the URL to handle Aiven SSL configurations
+        const url = new URL(dbUrlStr);
+        const sslRequired = url.searchParams.get('ssl-mode') === 'REQUIRED';
+        const dbName = url.pathname.replace('/', '') || 'emi_hub';
+
+        const connectionOptions = {
+            host: url.hostname,
+            port: url.port,
+            user: url.username,
+            password: url.password,
+            database: dbName,
+            ssl: sslRequired ? { rejectUnauthorized: false } : undefined
+        };
+
+        // Create database if it doesn't exist (only practical if we have privileges, but works for local)
         if (!process.env.DATABASE_URL) {
-            connection = await mysql.createConnection('mysql://root:@localhost:3306');
-            await connection.query('CREATE DATABASE IF NOT EXISTS emi_hub');
-            await connection.query('USE emi_hub');
+            connectionOptions.database = undefined;
+            connection = await mysql.createConnection(connectionOptions);
+            await connection.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
+            await connection.query(`USE ${dbName}`);
         } else {
-            connection = await mysql.createConnection(dbUrl);
+            connection = await mysql.createConnection(connectionOptions);
         }
 
         console.log("Dropping existing tables...");
