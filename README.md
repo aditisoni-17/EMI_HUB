@@ -58,4 +58,4 @@ npm run dev
 Visit the local URL (usually `http://localhost:5173`).
 
 ---
-*Developed by Antigravity for the 1Fi Full Stack Assignment.*
+
