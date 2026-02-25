@@ -1,13 +1,13 @@
 {
-  "name": "emi_hub_root",
-  "version": "1.0.0",
-  "description": "Root package for EMI Hub",
-  "scripts": {
-    "install:all": "cd frontend && npm install && cd ../backend && npm install",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && node index.js",
-    "dev": "npm run dev:frontend"
-  },
-  "author": "",
-  "license": "ISC"
+    "name": "emi_hub_root",
+    "version": "1.0.0",
+    "description": "Root package for EMI Hub",
+    "scripts": {
+        "postinstall": "cd frontend && npm install && cd ../backend && npm install",
+        "dev:frontend": "cd frontend && npm run dev",
+        "dev:backend": "cd backend && node index.js",
+        "dev": "npm run dev:frontend"
+    },
+    "author": "",
+    "license": "ISC"
 }
