@@ -4,6 +4,7 @@
     "description": "Root package for EMI Hub",
     "scripts": {
         "postinstall": "cd frontend && npm install && cd ../backend && npm install",
+        "build": "cd frontend && npm run build && cd .. && mkdir -p public && cp -r frontend/dist/* public/",
         "dev:frontend": "cd frontend && npm run dev",
         "dev:backend": "cd backend && node index.js",
         "dev": "npm run dev:frontend"
