@@ -1,9 +1,10 @@
 import React from 'react';
 
-const Navbar = ({ onSignupClick }) => {
+const Navbar = ({ onSignupClick, onMenuClick }) => {
     return (
         <nav className="bg-white border-b border-gray-100 sticky top-0 z-[60]">
             <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+                {/* ... existing code ... */}
                 <div className="flex items-center gap-12 flex-1">
                     {/* Logo */}
                     <div className="flex items-center gap-2 cursor-pointer group">
@@ -30,18 +31,26 @@ const Navbar = ({ onSignupClick }) => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-8 text-sm font-bold text-gray-500 uppercase tracking-wider ml-8">
-                    <div className="hidden lg:flex items-center gap-1 cursor-pointer hover:text-primary transition-colors hover:scale-105">
-                        For Business
+                <div className="flex items-center gap-6 ml-8">
+                    <div className="hidden lg:flex items-center gap-8 text-sm font-bold text-gray-500 uppercase tracking-wider">
+                        <div className="cursor-pointer hover:text-primary transition-colors hover:scale-105">For Business</div>
+                        <div className="cursor-pointer hover:text-primary transition-colors hover:scale-105">Pay EMI</div>
                     </div>
-                    <div className="hidden lg:flex items-center gap-1 cursor-pointer hover:text-primary transition-colors hover:scale-105">
-                        Pay EMI
-                    </div>
+
                     <button
                         onClick={onSignupClick}
-                        className="flex items-center gap-2 border-2 border-gray-100 rounded-xl px-6 py-2.5 hover:bg-gray-50 hover:border-primary/20 hover:text-primary transition-all active:scale-95 shadow-sm"
+                        className="flex items-center gap-2 border-2 border-gray-100 rounded-xl px-6 py-2.5 hover:bg-gray-50 hover:border-primary/20 hover:text-primary transition-all active:scale-95 shadow-sm text-sm font-bold text-gray-500 uppercase tracking-wider"
                     >
                         Sign-up
+                    </button>
+
+                    <button
+                        onClick={onMenuClick}
+                        className="p-3 hover:bg-gray-50 rounded-xl group transition-all"
+                    >
+                        <svg className="w-7 h-7 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
                     </button>
                 </div>
             </div>

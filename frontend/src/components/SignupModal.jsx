@@ -1,6 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const SignupModal = ({ onClose }) => {
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState('');
+
+    const handleGetOTP = async () => {
+        if (!phoneNumber || phoneNumber.length !== 10) {
+            setMessage('Please enter a valid 10-digit phone number');
+            return;
+        }
+
+        setIsLoading(true);
+        setMessage('');
+
+        try {
+            const response = await fetch('http://localhost:5001/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: 'Guest User', // Defaulting for now
+                    phoneNumber,
+                    password: 'temporary_password' // Defaulting for now
+                }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setMessage('OTP sent successfully! (Check server console)');
+                // In a real app, you'd show an OTP input field now
+            } else {
+                setMessage(data.message || 'Signup failed');
+            }
+        } catch (err) {
+            setMessage('Error connecting to server');
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
             <div className="bg-white rounded-[2.5rem] w-full max-w-lg p-10 relative shadow-2xl animate-in zoom-in-95 duration-300 mx-4">
@@ -37,15 +78,22 @@ const SignupModal = ({ onClose }) => {
                                 </div>
                                 <input
                                     type="tel"
-                                    placeholder=" "
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                    placeholder="Enter Phone"
                                     className="w-full border-2 border-gray-100 rounded-3xl py-6 pl-24 pr-6 text-2xl font-bold focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all shadow-inner bg-gray-50/50"
                                     autoFocus
                                 />
                             </div>
+                            {message && <p className={`text-center font-bold ${message.includes('Error') || message.includes('failed') ? 'text-red-500' : 'text-primary'}`}>{message}</p>}
                         </div>
 
-                        <button className="w-full bg-[#004d49] text-secondary font-black py-6 rounded-3xl text-2xl hover:bg-[#003d39] transition-all shadow-xl shadow-primary/20 active:scale-[0.98] mt-4">
-                            Get OTP
+                        <button
+                            onClick={handleGetOTP}
+                            disabled={isLoading}
+                            className={`w-full bg-[#004d49] text-secondary font-black py-6 rounded-3xl text-2xl hover:bg-[#003d39] transition-all shadow-xl shadow-primary/20 active:scale-[0.98] mt-4 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            {isLoading ? 'Processing...' : 'Get OTP'}
                         </button>
 
                         <div className="flex items-start gap-4 px-2 pt-2">

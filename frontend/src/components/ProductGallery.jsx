@@ -9,9 +9,17 @@ const ProductGallery = ({
     activeStorage,
     setActiveStorage
 }) => {
-    const [activeImage, setActiveImage] = useState(images[0]);
+    const [activeIndex, setActiveIndex] = useState(0);
     const [showVariantDropdown, setShowVariantDropdown] = useState(false);
     const [showStorageDropdown, setShowStorageDropdown] = useState(false);
+
+    // Close dropdowns when images prop changes
+    React.useEffect(() => {
+        setShowVariantDropdown(false);
+        setShowStorageDropdown(false);
+    }, [images]);
+
+    const activeImage = images[activeIndex] || images[0];
 
     return (
         <div className="flex flex-col lg:flex-row gap-6">
@@ -20,8 +28,8 @@ const ProductGallery = ({
                 {images.map((img, idx) => (
                     <button
                         key={idx}
-                        onClick={() => setActiveImage(img)}
-                        className={`w-16 h-16 rounded-xl border-2 overflow-hidden transition-all bg-white ${activeImage === img ? 'border-primary shadow-md' : 'border-gray-100 hover:border-gray-300'
+                        onClick={() => setActiveIndex(idx)}
+                        className={`w-16 h-16 rounded-xl border-2 overflow-hidden transition-all bg-white ${activeIndex === idx ? 'border-primary shadow-md' : 'border-gray-100 hover:border-gray-300'
                             }`}
                     >
                         <img src={img} alt={`thumbnail-${idx}`} className="w-full h-full object-cover" />
