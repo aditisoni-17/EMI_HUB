@@ -1,7 +1,8 @@
 import mysql from "mysql2/promise";
 
 function createPoolFromEnv() {
-  const dbUrlStr = process.env.DATABASE_URL || "mysql://root:@localhost:3306/emi_hub";
+  const dbUrlRaw = process.env.DATABASE_URL || "mysql://root:@localhost:3306/emi_hub";
+  const dbUrlStr = dbUrlRaw.trim().replace(/^['"]|['"]$/g, "");
   const url = new URL(dbUrlStr);
   const sslRequired = url.searchParams.get("ssl-mode") === "REQUIRED";
   const dbName = url.pathname.replace("/", "") || "emi_hub";
