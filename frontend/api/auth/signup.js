@@ -1,6 +1,6 @@
-const { pool } = require("../_db");
+import { pool } from "../_db.js";
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ message: "Method not allowed" });
@@ -38,4 +38,4 @@ module.exports = async function handler(req, res) {
     console.error("Signup error:", err);
     return res.status(500).json({ message: "Server error" });
   }
-};
+}

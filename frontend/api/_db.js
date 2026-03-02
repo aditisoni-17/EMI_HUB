@@ -1,4 +1,4 @@
-const mysql = require("mysql2/promise");
+import mysql from "mysql2/promise";
 
 function createPoolFromEnv() {
   const dbUrlStr = process.env.DATABASE_URL || "mysql://root:@localhost:3306/emi_hub";
@@ -19,6 +19,4 @@ function createPoolFromEnv() {
   });
 }
 
-module.exports = {
-  pool: createPoolFromEnv(),
-};
+export const pool = createPoolFromEnv();
