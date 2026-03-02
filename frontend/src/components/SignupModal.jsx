@@ -15,7 +15,8 @@ const SignupModal = ({ onClose }) => {
         setMessage('');
 
         try {
-            const response = await fetch('http://localhost:5001/api/auth/signup', {
+            const baseUrl = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : '');
+            const response = await fetch(`${baseUrl}/api/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
