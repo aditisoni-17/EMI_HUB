@@ -8,14 +8,6 @@ export default async function handler(req, res) {
 
   try {
     const [products] = await pool.query("SELECT * FROM products");
-    for (const product of products) {
-      const [plans] = await pool.query("SELECT * FROM emi_plans WHERE product_id = ?", [product.id]);
-      product.emiPlans = plans;
-      product.variantImages =
-        typeof product.variantImages === "string" ? JSON.parse(product.variantImages) : product.variantImages;
-      product.variants = typeof product.variants === "string" ? JSON.parse(product.variants) : product.variants;
-      product.storages = typeof product.storages === "string" ? JSON.parse(product.storages) : product.storages;
-    }
     return res.status(200).json(products);
   } catch (err) {
     console.error("DB Error fetching products:", err);
